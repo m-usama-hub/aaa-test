@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* Product Sans Fonts */
+@font-face {
+  font-family: 'ProductSansBold';
+  src: url(/fonts/product_sans_bold-webfont.woff2) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ProductSansRegular';
+  src: url(/fonts/product_sans_regular-webfont.woff2) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,5 +39,617 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'ProductSansRegular', Arial, Helvetica, sans-serif;
+}
+
+/* Custom checkbox styling */
+input[type="checkbox"] {
+  accent-color: #dc2626;
+}
+
+/* Location Picker Popup Styles */
+.pickupReturnLocationPopup {
+  position: absolute;
+  left: 0;
+  z-index: 999;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.34vw;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  margin-top: 0.5vw;
+  min-height: 300px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  top: auto;
+  bottom: auto;
+}
+
+.pickupReturnLocationPopup.full-width {
+  width: 100%;
+}
+
+.pickupReturnLocationPopup .inner-wrapper {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.pickupReturnLocationPopup .left-section {
+  width: 40%;
+  border-right: 1px solid #e5e5e5;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.38vw;
+  flex-shrink: 0;
+  min-height: 0;
+  max-height: 100%;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.left-section-datetime {
+  background: #f9f9f9;
+}
+
+.pickupReturnLocationPopup .selectedLocations {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pickupReturnLocationPopup .no-results {
+  padding: 2.08vw 1.04vw;
+  text-align: center;
+  color: #666;
+}
+
+.pickupReturnLocationPopup .no-results p {
+  margin: 0;
+  font-size: 1.11vw;
+  line-height: 1.49vw;
+}
+
+.pickupReturnLocationPopup .branchTypeOuterWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.69vw;
+  padding: 1.04vw 0.69vw;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 0.69vw;
+}
+
+.pickupReturnLocationPopup .branchTypeOuterWrapper svg {
+  color: #e31a37;
+  width: 1.38vw;
+  height: 1.38vw;
+}
+
+.pickupReturnLocationPopup .branchTypeOuterWrapper p {
+  font-weight: bold;
+  color: #231f20;
+  margin: 0;
+  font-size: 1.11vw;
+  line-height: 1.49vw;
+}
+
+.pickupReturnLocationPopup .selectedLocations li {
+  padding: 0.83vw 1.04vw;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 0.34vw;
+}
+
+.pickupReturnLocationPopup .selectedLocations li:hover {
+  background: #f5f5f5;
+}
+
+.pickupReturnLocationPopup .selectedLocations li h6 {
+  margin: 0;
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  color: #666;
+  font-weight: normal;
+}
+
+.pickupReturnLocationPopup .selectedLocations li h6.active {
+  color: #e31a37;
+  font-weight: bold;
+}
+
+.pickupReturnLocationPopup .right-section-c {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  min-height: 0;
+  max-height: 100%;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pickupReturnLocationPopup .location-address {
+  padding: 2.08vw;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.pickupReturnLocationPopup .location-address .icon {
+  margin-bottom: 1.04vw;
+}
+
+.pickupReturnLocationPopup .location-address h6 {
+  font-size: 1.38vw;
+  line-height: 1.87vw;
+  font-weight: bold;
+  color: #231f20;
+  margin: 0 0 0.69vw 0;
+}
+
+.pickupReturnLocationPopup .location-address span {
+  display: block;
+  color: #666;
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  margin-bottom: 0.55vw;
+}
+
+.pickupReturnLocationPopup .location-address .timeMapping {
+  color: #231f20;
+  font-weight: 500;
+}
+
+.pickupReturnLocationPopup .messageArea {
+  margin-top: 1.04vw;
+  padding: 1.04vw;
+  background: #fff5f5;
+  border-radius: 0.34vw;
+}
+
+.pickupReturnLocationPopup .messageText {
+  color: #e31a37;
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  margin: 0;
+}
+
+.pickupReturnLocationPopup .showMoreMessage {
+  color: #e31a37;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.pickupReturnLocationPopup .iframe-wrapper {
+  flex: 1;
+  min-height: 27.77vw;
+}
+
+.pickupReturnLocationPopup .iframe-wrapper iframe {
+  width: 100%;
+  height: 100%;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .pickupReturnLocationPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .pickupReturnLocationPopup .inner-wrapper {
+    flex-direction: column;
+    max-height: 100vh;
+  }
+
+  .pickupReturnLocationPopup .left-section,
+  .pickupReturnLocationPopup .right-section-c {
+    width: 100%;
+  }
+
+  .pickupReturnLocationPopup .left-section {
+    border-right: none;
+    border-bottom: 1px solid #e5e5e5;
+    max-height: 40vh;
+  }
+
+  .pickupReturnLocationPopup .no-results p {
+    font-size: 16px;
+    line-height: 20px;
+  }
+}
+
+/* Date/Time Picker Popup Styles */
+.dateTimePickerPopup {
+  position: absolute;
+  left: 0;
+  z-index: 999;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.34vw;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  margin-top: 0.5vw;
+  min-height: 300px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  top: auto;
+  bottom: auto;
+}
+
+.dateTimePickerPopup .inner-wrapper {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.dateTimePickerPopup .left-section-datetime {
+  width: 40%;
+  border-right: 1px solid #e5e5e5;
+  padding: 2.08vw;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  min-height: 0;
+  max-height: 100%;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dateTimePickerPopup .location-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.38vw;
+}
+
+.dateTimePickerPopup .location-item {
+  display: flex;
+  gap: 1.04vw;
+  align-items: flex-start;
+}
+
+.dateTimePickerPopup .location-icon {
+  width: 1.66vw;
+  height: 1.66vw;
+  color: #e31a37;
+  flex-shrink: 0;
+  margin-top: 0.2vw;
+}
+
+.dateTimePickerPopup .location-info {
+  flex: 1;
+}
+
+.dateTimePickerPopup .location-name {
+  font-size: 1.11vw;
+  line-height: 1.49vw;
+  font-weight: normal;
+  color: #231f20;
+  margin-bottom: 0.55vw;
+  text-transform: none;
+}
+
+.dateTimePickerPopup .location-datetime {
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  color: #666;
+}
+
+.dateTimePickerPopup .location-connector {
+  width: 2px;
+  height: 1.38vw;
+  background: #e5e5e5;
+  margin-left: 0.83vw;
+}
+
+.dateTimePickerPopup .right-section-datetime {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  padding: 2.08vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  min-height: 0;
+  max-height: 100%;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dateTimePickerPopup .calendar-section {
+  margin-bottom: 2.08vw;
+}
+
+.dateTimePickerPopup .calendar-navigation {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.dateTimePickerPopup .calendar-nav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #231f20;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.dateTimePickerPopup .calendar-nav-btn:hover {
+  color: #e31a37;
+}
+
+.dateTimePickerPopup .calendar-nav-left {
+  margin-right: 1.38vw;
+}
+
+.dateTimePickerPopup .calendar-nav-right {
+  margin-left: 1.38vw;
+}
+
+.dateTimePickerPopup .calendar-months {
+  display: flex;
+  gap: 2.08vw;
+  flex: 1;
+}
+
+.dateTimePickerPopup .calendar-month {
+  flex: 1;
+}
+
+.dateTimePickerPopup .calendar-month-header {
+  font-size: 1.11vw;
+  line-height: 1.49vw;
+  font-weight: bold;
+  color: #231f20;
+  margin-bottom: 1.04vw;
+  text-align: center;
+}
+
+.dateTimePickerPopup .calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5vw;
+  margin-bottom: 0.69vw;
+}
+
+.dateTimePickerPopup .calendar-weekday {
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  color: #666;
+  text-align: center;
+  font-weight: 500;
+}
+
+.dateTimePickerPopup .calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5vw;
+}
+
+.dateTimePickerPopup .calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  color: #231f20;
+  cursor: pointer;
+  border-radius: 0.34vw;
+  transition: all 0.2s;
+}
+
+.dateTimePickerPopup .calendar-day.empty {
+  cursor: default;
+}
+
+.dateTimePickerPopup .calendar-day.past {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.dateTimePickerPopup .calendar-day.selected {
+  background: #e5e5e5;
+  font-weight: bold;
+}
+
+.dateTimePickerPopup .calendar-day.active {
+  background: #231f20;
+  color: white;
+}
+
+.dateTimePickerPopup .calendar-day:not(.past):not(.empty):hover {
+  background: #f5f5f5;
+}
+
+.dateTimePickerPopup .calendar-day.active:hover {
+  background: #231f20;
+}
+
+.dateTimePickerPopup .time-selectors-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1.38vw;
+}
+
+.dateTimePickerPopup .time-selector-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.69vw;
+}
+
+.dateTimePickerPopup .time-selector-label {
+  font-size: 1.11vw;
+  line-height: 1.49vw;
+  font-weight: bold;
+  color: #231f20;
+  margin: 0;
+}
+
+.dateTimePickerPopup .time-selector-display {
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  color: #666;
+  margin-bottom: 0.5vw;
+}
+
+.dateTimePickerPopup .time-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.83vw;
+}
+
+.dateTimePickerPopup .time-btn {
+  width: 2.08vw;
+  height: 2.08vw;
+  border: 1px solid #e5e5e5;
+  background: white;
+  border-radius: 0.34vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.38vw;
+  line-height: 1.87vw;
+  color: #231f20;
+  transition: all 0.2s;
+}
+
+.dateTimePickerPopup .time-btn:hover {
+  background: #f5f5f5;
+  border-color: #c9c9c9;
+}
+
+.dateTimePickerPopup .time-value {
+  flex: 1;
+}
+
+.dateTimePickerPopup .time-number {
+  font-size: 1.38vw;
+  line-height: 1.87vw;
+  font-weight: bold;
+  color: #231f20;
+  text-decoration: underline;
+}
+
+.dateTimePickerPopup .time-period {
+  display: flex;
+  gap: 0.55vw;
+}
+
+.dateTimePickerPopup .period-btn {
+  padding: 0.55vw 1.04vw;
+  border: 1px solid #e5e5e5;
+  background: white;
+  border-radius: 0.34vw;
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  font-weight: bold;
+  color: #231f20;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dateTimePickerPopup .period-btn:hover {
+  background: #f5f5f5;
+}
+
+.dateTimePickerPopup .period-btn.active {
+  background: #231f20;
+  color: white;
+  border-color: #231f20;
+}
+
+.dateTimePickerPopup .days-difference {
+  padding: 0.55vw 1.04vw;
+  background: #e5e5e5;
+  border-radius: 1.38vw;
+  font-size: 0.97vw;
+  line-height: 1.32vw;
+  color: #666;
+  text-align: center;
+  align-self: center;
+  margin: 0.69vw 0;
+  font-weight: normal;
+}
+
+/* Responsive for smaller screens (less than 1920px width or 600px height) */
+@media (max-width: 1920px), (max-height: 600px) {
+  .dateTimePickerPopup {
+    position: absolute;
+    min-height: 300px;
+    max-height: 90vh;
+    top: auto !important;
+    bottom: auto !important;
+  }
+
+  .pickupReturnLocationPopup {
+    position: absolute;
+    min-height: 300px;
+    max-height: 90vh;
+    top: auto !important;
+    bottom: auto !important;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dateTimePickerPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .dateTimePickerPopup .inner-wrapper {
+    flex-direction: column;
+    max-height: 100vh;
+  }
+
+  .dateTimePickerPopup .left-section-datetime,
+  .dateTimePickerPopup .right-section-datetime {
+    width: 100%;
+  }
+
+  .dateTimePickerPopup .left-section-datetime {
+    border-right: none;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .dateTimePickerPopup .calendar-months {
+    flex-direction: column;
+  }
 }

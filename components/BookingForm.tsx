@@ -135,7 +135,7 @@ export default function BookingForm({ type }: BookingFormProps) {
                     <div className="flex flex-col gap-[1vw]">
                         {/* Pickup Location Input Wrapper */}
                         <div className="gap-[1vw]" style={{ display: !sameReturnLocation ? 'flex' : '' }}>
-                            <div ref={pickupRef} className="flex-col items-start bg-white  text-[#231f20] font-bold transition-colors cursor-pointer relative" >
+                            <div ref={pickupRef} className="flex-col items-start bg-white  text-[#231f20] font-bold transition-colors cursor-pointer relative" style={{ width: !sameReturnLocation ? '50%' : '100%' }}>
                                 <div 
                                     className={`flex-1 flex items-center border rounded-[0.34vw] cursor-pointer transition-all ${
                                         isPickupPopupOpen 
@@ -225,7 +225,7 @@ export default function BookingForm({ type }: BookingFormProps) {
                             </div>
                             {/* Return Location Input Wrapper - Only show for Start Booking when checkbox is unchecked */}
                             {isStartBooking && !sameReturnLocation && (
-                            <div ref={returnRef} className="flex-col items-start bg-white  text-[#231f20] font-bold transition-colors cursor-pointer relative" >
+                            <div ref={returnRef} className="flex-col items-start bg-white  text-[#231f20] font-bold transition-colors cursor-pointer relative" style={{ width: !sameReturnLocation ? '50%' : '' }}>
                                     <div 
                                         className={`flex-1 flex items-center border rounded-[0.34vw] cursor-pointer transition-all ${
                                             isReturnPopupOpen 

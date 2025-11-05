@@ -150,7 +150,21 @@ export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation,
 
   useEffect(() => {
     const updatePopupPosition = () => {
-      if (isOpen && containerRef?.current && popupRef.current) {
+      if (!isOpen) return;
+      const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+      if (popupRef.current && isMobile) {
+        // Clear inline positioning to allow CSS to make it full-screen on mobile
+        const popup = popupRef.current;
+        popup.style.width = '';
+        popup.style.left = '';
+        popup.style.top = '';
+        popup.style.bottom = '';
+        popup.style.height = '';
+        popup.style.maxHeight = '';
+        return;
+      }
+
+      if (containerRef?.current && popupRef.current) {
         const formRect = containerRef.current.getBoundingClientRect();
         const popup = popupRef.current;
         const popupParent = popup.parentElement;

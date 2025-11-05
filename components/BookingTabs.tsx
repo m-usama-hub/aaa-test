@@ -10,7 +10,7 @@ export default function BookingTabs() {
   const [activeTab, setActiveTab] = useState<TabType>('startBooking');
 
   return (
-    <div className="bg-white rounded-lg" style={{ background: 'white' }}>
+    <div className="booking-tabs bg-white rounded-lg" style={{ background: 'white' }}>
       {/* Tabs Header */}
       <nav style={{ background: 'white' }}>
         <div className="flex border-b border-[#d0d5dd]">

@@ -81,8 +81,8 @@ export default function BookingForm({ type }: BookingFormProps) {
     };
 
     return (
-        <form ref={formRef}>
-            <div className="flex gap-[1vw]">
+        <form ref={formRef} className="booking-form">
+            <div className="booking-row flex gap-[1vw]">
                 {/* Pickup & Return Location Section */}
                 <div className='w-full'>
                     <label

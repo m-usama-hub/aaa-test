@@ -1175,6 +1175,8 @@ input[type="checkbox"] {
     -webkit-overflow-scrolling: touch;
     gap: 16px;
     padding: 0 16px;
+    overflow-x: visible;
+    justify-content: center !important;
   }
 
   .booking-tabs nav button {

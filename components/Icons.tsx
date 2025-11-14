@@ -83,8 +83,8 @@ export function ChevronRightIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="0.51vw"
-      height="0.933vw"
+      width="100%"
+      height="100%"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -93,6 +93,25 @@ export function ChevronRightIcon() {
       strokeLinejoin="round"
     >
       <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  );
+}
+
+export function CloseIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100%"
+      height="100%"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
     </svg>
   );
 }

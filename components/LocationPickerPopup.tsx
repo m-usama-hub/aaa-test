@@ -1,13 +1,19 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
+import { useBranches } from '@/lib/hooks/useBranches';
+import { Branch } from '@/lib/api';
+import { CloseIcon } from './Icons';
 
 type Location = {
+  id: string;
   name: string;
   details?: string;
   hours?: string;
   message?: string;
   mapUrl?: string;
+  branchType?: string;
+  stateName?: string;
 };
 
 type LocationPickerPopupProps = {
@@ -17,96 +23,144 @@ type LocationPickerPopupProps = {
   title: string;
   containerRef?: { current: HTMLFormElement | null };
   searchQuery?: string;
+  selectedLocationName?: string;
 };
 
-const locations = {
-  airportLocations: [
-    {
-      name: 'Dubai Airport - Terminal 1 (DXB)',
-      details: 'Dubai Airport Terminal 1 - Arrivals Hall',
-      hours: 'Sunday-Saturday : 00:00-23:59',
-      message: 'Monthly rentals from Dubai & Sharjah airports are subject to Premium charge',
-      mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.635369064972!2d55.34954871125346!3d25.249203477584405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5d0601c62bdd%3A0x21cb595384b197f5!2sDollar%20Car%20Rental!5e0!3m2!1sen!2sae!4v1689856281638!5m2!1sen!2sae'
-    },
-    { name: 'Dubai Airport - Terminal 2 (DXB)' },
-    { name: 'Dubai Airport - Terminal 3 (DXB)' },
-    { name: 'Sharjah Airport (SHJ)' },
-    { name: 'Zayed International Airport (AUH)' }
-  ],
-  freeDeliveryAreas: [
-    { name: 'Dubai Motor City' },
-    { name: 'Dubai Marina Mall' },
-    { name: 'Dubai Mall' },
-    { name: 'Mall of the Emirates' },
-    { name: 'Burjuman Mall' },
-    { name: 'Jumeirah Village Circle - JVC' },
-    { name: 'Deira City Centre' },
-    { name: 'Al Barsha' },
-    { name: 'Al Ghurair Mall' },
-    { name: 'Near Al Raha Mall- Abu Dhabi' },
-    { name: 'Discovery Gardens' },
-    { name: 'Dubai Creek Harbour' },
-    { name: 'Near Dalma Mall-Abu Dhabi' },
-    { name: 'Dubai Festival City' },
-    { name: 'Dubai Green Community' },
-    { name: 'Dubai International Financial Centre (DIFC)' },
-    { name: 'Dubai Palm Jumeirah' },
-    { name: 'Dubai Sports City' },
-    { name: 'Four Points by Sheraton – Sheikh Zayed Road' },
-    { name: 'Near Galleria Mall- Abu Dhabi' },
-    { name: 'Ibn Battuta Mall' },
-    { name: 'Near Khalidiya Mall- Abu Dhabi' },
-    { name: 'Near Mazyad Mall- Abu Dhabi' },
-    { name: 'Meaisem City Centre' },
-    { name: 'Meydan - Dubai' },
-    { name: 'Mirdiff City Centre' },
-    { name: 'Sahara Centre - Sharjah' },
-    { name: 'Sharjah City Centre' },
-    { name: 'Near Yas Mall- Abu Dhabi' },
-    { name: 'Near Al Ain Mall- Al Ain' },
-    { name: 'Al Jaddaf - Dubai' },
-    { name: 'The Springs Souk' },
-    { name: 'Near Boutik Mall-Abu Dhabi' },
-    { name: 'Near Deerfields Mall- Abu Dhabi' },
-    { name: 'Dubai Damac Hills 1' },
-    { name: 'Arabian Ranches' }
-  ],
-  dubaiBranches: [
-    { name: 'Arenco Building - Karama - Dubai' },
-    { name: 'Dubai Hills Mall' },
-    { name: 'Central Reservations Counter - Alquoz' },
-    { name: 'Delta Hotels - Dubai' },
-    { name: 'Dubai Four Points Sheraton - Bur Dubai' },
-    { name: 'First Avenue Mall - Motor City' },
-    { name: 'Jumeirah Lake Towers - Dubai' },
-    { name: 'Oasis Mall - Dubai' },
-    { name: 'Arenco Tower - Dubai Media City' },
-    { name: 'Silicon Central Mall' },
-    { name: 'Danube Sports World - Al Habtoor City' },
-    { name: 'Business Bay Square - Dubai' }
-  ],
-  abuDhabiBranches: [
-    { name: 'Al Maha Arjaan' },
-    { name: 'Al Wahda Mall' },
-    { name: 'Crowne Plaza Yas Island' },
-    { name: 'Inter Continental Hotel' },
-    { name: 'Mussafah' },
-    { name: 'Nation Towers' },
-    { name: 'Novotel Hotel' },
-    { name: 'Al Reem Mall' }
-  ],
-  sharjahBranches: [
-    { name: 'Sharjah Main Office' }
-  ],
-  alAinBranches: [
-    { name: 'Al Jimi Mall' }
-  ]
+// Helper function to convert Branch to Location
+const branchToLocation = (branch: Branch): Location => {
+  // Format hours from BranchOfficeTiming
+  const formatHours = (timings: Branch['BranchOfficeTiming']) => {
+    if (!timings?.BranchTimings || timings.BranchTimings.length === 0) return undefined;
+    
+    return timings.BranchTimings.map(timing => {
+      const shifts = timing.Shifts.join(', ');
+      return `${timing.DayString} : ${shifts}`;
+    }).join(' | ');
+  };
+
+  return {
+    id: branch._id,
+    name: branch.Name,
+    details: branch.Address,
+    hours: formatHours(branch.BranchOfficeTiming),
+    message: branch.Message || undefined,
+    mapUrl: branch.GoogleLocationURL || undefined,
+    branchType: branch.BranchType?.Name,
+    stateName: branch.CountryState?.StateName,
+  };
 };
 
-export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation, title, containerRef, searchQuery = '' }: LocationPickerPopupProps) {
-  const [selectedLocation, setSelectedLocation] = useState<Location>(locations.airportLocations[0]);
+// Helper function to group branches by type and state
+const groupBranches = (branches: Branch[]) => {
+  const grouped: {
+    [key: string]: {
+      typeName: string;
+      branches: Location[];
+    };
+  } = {};
+
+  branches.forEach(branch => {
+    const location = branchToLocation(branch);
+    const branchTypeName = branch.BranchType?.Name || 'Other';
+    
+    // Create a key for grouping (type + state for better organization)
+    const key = `${branchTypeName}`;
+    
+    if (!grouped[key]) {
+      grouped[key] = {
+        typeName: branchTypeName,
+        branches: [],
+      };
+    }
+    
+    grouped[key].branches.push(location);
+  });
+
+  return grouped;
+};
+
+export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation, containerRef, searchQuery = '', selectedLocationName }: LocationPickerPopupProps) {
+  const { data: branches = [], isLoading, error } = useBranches('UAE');
+  console.log(branches,"branches");
+  // Convert branches to locations and group them
+  const groupedLocations = useMemo(() => {
+    if (!branches.length) return {};
+    return groupBranches(branches);
+  }, [branches]);
+  console.log(groupedLocations);
+  // Get first location for initial selection
+  const firstLocation = useMemo(() => {
+    if (branches.length > 0) {
+      return branchToLocation(branches[0]);
+    }
+    return null;
+  }, [branches]);
+
+  // Find selected location from branches if selectedLocationName is provided
+  const selectedLocationFromProps = useMemo(() => {
+    if (selectedLocationName && branches.length > 0) {
+      const branch = branches.find(b => b.Name === selectedLocationName);
+      return branch ? branchToLocation(branch) : null;
+    }
+    return null;
+  }, [selectedLocationName, branches]);
+
+  // Initialize selected location - use prop value if provided, otherwise null
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [hoveredLocation, setHoveredLocation] = useState<Location | null>(null);
   const [showMoreMessage, setShowMoreMessage] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Update selected location when selectedLocationName prop changes or popup opens
+  const prevIsOpenRef = useRef(isOpen);
+  useLayoutEffect(() => {
+    if (isOpen && !prevIsOpenRef.current) {
+      // Popup just opened - set selected location from prop if available
+      if (selectedLocationFromProps) {
+        setSelectedLocation(selectedLocationFromProps);
+      } else {
+        setSelectedLocation(null);
+      }
+      setHoveredLocation(null);
+    } else if (selectedLocationFromProps && selectedLocationFromProps.id !== selectedLocation?.id) {
+      // Update selected location when prop changes
+      setSelectedLocation(selectedLocationFromProps);
+    }
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen, selectedLocationFromProps, selectedLocation]);
+
+  // Use selectedLocationFromProps for highlighting (from prop) or selectedLocation (from click)
+  const effectiveSelectedLocation = selectedLocationFromProps || selectedLocation;
+
+  // Check if mobile and handle search input focus
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  // Focus search input on mobile when popup opens and reset search when closed
+  useEffect(() => {
+    if (isOpen && isMobile && searchInputRef.current) {
+      // Small delay to ensure popup is rendered
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    } else if (!isOpen) {
+      // Reset mobile search when popup closes
+      setMobileSearchQuery('');
+    }
+  }, [isOpen, isMobile]);
 
   // Disable body scroll when popup is open
   useEffect(() => {
@@ -153,14 +207,19 @@ export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation,
       if (!isOpen) return;
       const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
       if (popupRef.current && isMobile) {
-        // Clear inline positioning to allow CSS to make it full-screen on mobile
+        // Clear all inline positioning styles to allow CSS to make it full-screen on mobile
         const popup = popupRef.current;
         popup.style.width = '';
         popup.style.left = '';
         popup.style.top = '';
         popup.style.bottom = '';
+        popup.style.right = '';
         popup.style.height = '';
         popup.style.maxHeight = '';
+        popup.style.marginTop = '';
+        popup.style.marginBottom = '';
+        // Ensure full screen on mobile
+        popup.style.position = '';
         return;
       }
 
@@ -231,179 +290,179 @@ export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation,
 
   const handleLocationClick = (location: Location) => {
     setSelectedLocation(location);
+    setHoveredLocation(null); // Clear hover on click
     onSelectLocation(location.name);
-    onClose();
+    onClose(); // Close popup when location is selected
   };
 
-  // Filter locations based on search query
+  const handleLocationHover = (location: Location) => {
+    setHoveredLocation(location);
+  };
+
+  const handleLocationLeave = () => {
+    setHoveredLocation(null);
+  };
+
+  // Get the location to display on map (hovered or selected or first location as default)
+  // Priority: hovered > selected (from prop or click) > first location
+  const displayLocation = hoveredLocation || effectiveSelectedLocation || firstLocation;
+
+  // Use mobile search query if on mobile, otherwise use prop searchQuery
+  const effectiveSearchQuery = isMobile ? mobileSearchQuery : searchQuery;
+
+  // Filter locations based on search query - only filter if user has typed something
   const filterLocations = (locationList: Location[]) => {
-    if (!searchQuery.trim()) return locationList;
-    const query = searchQuery.toLowerCase();
+    // If searchQuery is empty, undefined, or only whitespace, return all locations
+    if (!effectiveSearchQuery || !effectiveSearchQuery.trim()) {
+      return locationList;
+    }
+    
+    // Only filter when user has actually typed something
+    const query = effectiveSearchQuery.trim().toLowerCase();
     return locationList.filter(location => 
       location.name.toLowerCase().includes(query) ||
-      location.details?.toLowerCase().includes(query)
+      location.details?.toLowerCase().includes(query) ||
+      location.stateName?.toLowerCase().includes(query)
     );
   };
 
-  // Get all location categories with their filtered locations
-  const getFilteredLocationCategories = () => {
-    const filteredAirports = filterLocations(locations.airportLocations);
-    const filteredFreeDelivery = filterLocations(locations.freeDeliveryAreas);
-    const filteredDubai = filterLocations(locations.dubaiBranches);
-    const filteredAbuDhabi = filterLocations(locations.abuDhabiBranches);
-    const filteredSharjah = filterLocations(locations.sharjahBranches);
-    const filteredAlAin = filterLocations(locations.alAinBranches);
 
-    return {
-      airportLocations: filteredAirports,
-      freeDeliveryAreas: filteredFreeDelivery,
-      dubaiBranches: filteredDubai,
-      abuDhabiBranches: filteredAbuDhabi,
-      sharjahBranches: filteredSharjah,
-      alAinBranches: filteredAlAin
-    };
+  // Get filtered grouped locations - show all if no search query, otherwise filter
+  // Always show group names even if no locations match
+  const getFilteredGroupedLocations = () => {
+    // If no search query, return all grouped locations
+    if (!effectiveSearchQuery || !effectiveSearchQuery.trim()) {
+      return groupedLocations;
+    }
+    
+    // Otherwise, apply filter but keep all groups (even if empty)
+    const filtered: typeof groupedLocations = {};
+    
+    Object.keys(groupedLocations).forEach(key => {
+      const group = groupedLocations[key];
+      const filteredBranches = filterLocations(group.branches);
+      // Always include the group, even if no branches match
+      filtered[key] = {
+        typeName: group.typeName,
+        branches: filteredBranches,
+      };
+    });
+    
+    return filtered;
   };
 
-  const filteredLocations = getFilteredLocationCategories();
+  const filteredGroupedLocations = getFilteredGroupedLocations();
+  const hasSearchQuery = effectiveSearchQuery && effectiveSearchQuery.trim().length > 0;
 
   return (
     <div ref={popupRef} className="pickupReturnLocationPopup">
+      {/* Mobile Close Button */}
+      <button
+        onClick={onClose}
+        className="popup-close-btn md:hidden"
+        aria-label="Close popup"
+      >
+        <CloseIcon />
+      </button>
       {/* Inner Wrapper */}
       <div className="inner-wrapper">
+        {/* Mobile Search Input */}
+        <div className="mobile-search-container md:hidden">
+          <div className="mobile-search-wrapper">
+            <svg 
+              className="mobile-search-icon" 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              placeholder="Search locations..."
+              className="mobile-search-input"
+            />
+            {mobileSearchQuery && (
+              <button
+                onClick={() => setMobileSearchQuery('')}
+                className="mobile-search-clear"
+                aria-label="Clear search"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
         {/* Left Section - Location List */}
         <div className="left-section">
+          {isLoading ? (
+            <div className="loading-state" style={{ padding: '2vw', textAlign: 'center' }}>
+              <p>Loading locations...</p>
+            </div>
+          ) : error ? (
+            <div className="error-state" style={{ padding: '2vw', textAlign: 'center', color: '#e31a37' }}>
+              <p>Error loading locations. Please try again.</p>
+            </div>
+          ) : (
           <ul className="selectedLocations">
-            {/* Airport Locations */}
-            {filteredLocations.airportLocations.length > 0 && (
-              <div>
-                <div className="branchTypeOuterWrapper" style={{ border: 0 }}>
+              {Object.keys(filteredGroupedLocations).length > 0 ? (
+                Object.keys(filteredGroupedLocations).map((key, groupIndex) => {
+                  const group = filteredGroupedLocations[key];
+                  const isFirstGroup = groupIndex === 0;
+                  
+                  return (
+                    <div key={key}>
+                      <div className="branchTypeOuterWrapper" style={{ border: isFirstGroup ? 0 : undefined }}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <p>Airport Locations</p>
+                        <p>{group.typeName}</p>
                 </div>
-                {filteredLocations.airportLocations.map((location, index) => (
-                  <li key={index} onClick={() => handleLocationClick(location)}>
-                    <h6 className={`drop-val ${selectedLocation.name === location.name ? 'active' : ''}`}>
-                      {location.name}
-                    </h6>
-                  </li>
-                ))}
+                      {group.branches.length > 0 ? (
+                        group.branches.map((location) => {
+                          const isSelected = effectiveSelectedLocation?.id === location.id;
+                          
+                          return (
+                            <li
+                              key={location.id}
+                              onClick={() => handleLocationClick(location)}
+                              onMouseEnter={() => handleLocationHover(location)}
+                              onMouseLeave={handleLocationLeave}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              <h6 className={`drop-val ${isSelected ? 'active' : ''}`}>
+                        {location.name}
+                      </h6>
+                    </li>
+                          );
+                        })
+                      ) : null}
               </div>
-            )}
-
-            {/* Free Delivery Areas */}
-            {filteredLocations.freeDeliveryAreas.length > 0 && (
-              <div>
-                <div className="branchTypeOuterWrapper">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <p>Free Delivery Areas</p>
-                </div>
-                {filteredLocations.freeDeliveryAreas.map((location, index) => (
-                  <li key={index} onClick={() => handleLocationClick(location)}>
-                    <h6 className={`drop-val ${selectedLocation.name === location.name ? 'active' : ''}`}>
-                      {location.name}
-                    </h6>
-                  </li>
-                ))}
-              </div>
-            )}
-
-            {/* Dubai Branches */}
-            {filteredLocations.dubaiBranches.length > 0 && (
-              <div>
-                <div className="branchTypeOuterWrapper">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <p>Dubai Branches</p>
-                </div>
-                {filteredLocations.dubaiBranches.map((location, index) => (
-                  <li key={index} onClick={() => handleLocationClick(location)}>
-                    <h6 className={`drop-val ${selectedLocation.name === location.name ? 'active' : ''}`}>
-                      {location.name}
-                    </h6>
-                  </li>
-                ))}
-              </div>
-            )}
-
-            {/* Abu Dhabi Branches */}
-            {filteredLocations.abuDhabiBranches.length > 0 && (
-              <div>
-                <div className="branchTypeOuterWrapper">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <p>Abu Dhabi Branches</p>
-                </div>
-                {filteredLocations.abuDhabiBranches.map((location, index) => (
-                  <li key={index} onClick={() => handleLocationClick(location)}>
-                    <h6 className={`drop-val ${selectedLocation.name === location.name ? 'active' : ''}`}>
-                      {location.name}
-                    </h6>
-                  </li>
-                ))}
-              </div>
-            )}
-
-            {/* Sharjah Branches */}
-            {filteredLocations.sharjahBranches.length > 0 && (
-              <div>
-                <div className="branchTypeOuterWrapper">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <p>Sharjah Branches</p>
-                </div>
-                {filteredLocations.sharjahBranches.map((location, index) => (
-                  <li key={index} onClick={() => handleLocationClick(location)}>
-                    <h6 className={`drop-val ${selectedLocation.name === location.name ? 'active' : ''}`}>
-                      {location.name}
-                    </h6>
-                  </li>
-                ))}
-              </div>
-            )}
-
-            {/* Al Ain Branches */}
-            {filteredLocations.alAinBranches.length > 0 && (
-              <div>
-                <div className="branchTypeOuterWrapper">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <p>Al Ain Branches</p>
-                </div>
-                {filteredLocations.alAinBranches.map((location, index) => (
-                  <li key={index} onClick={() => handleLocationClick(location)}>
-                    <h6 className={`drop-val ${selectedLocation.name === location.name ? 'active' : ''}`}>
-                      {location.name}
-                    </h6>
-                  </li>
-                ))}
-              </div>
-            )}
-
-            {/* No Results Message */}
-            {searchQuery.trim() && 
-             filteredLocations.airportLocations.length === 0 &&
-             filteredLocations.freeDeliveryAreas.length === 0 &&
-             filteredLocations.dubaiBranches.length === 0 &&
-             filteredLocations.abuDhabiBranches.length === 0 &&
-             filteredLocations.sharjahBranches.length === 0 &&
-             filteredLocations.alAinBranches.length === 0 && (
+                  );
+                })
+              ) : hasSearchQuery ? (
               <div className="no-results">
-                <p>No locations found matching &quot;{searchQuery}&quot;</p>
+                <p>No locations found matching &quot;{effectiveSearchQuery}&quot;</p>
               </div>
+              ) : null}
+            </ul>
             )}
-          </ul>
         </div>
 
         {/* Right Section - Location Details & Map */}
         <div className="right-section-c">
+          {displayLocation ? (
+            <>
           <div className="location-address">
             <div className="icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e31a37">
@@ -411,18 +470,18 @@ export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation,
               </svg>
             </div>
             <h6 id="updatePickedLocation">
-              <span id="selectedPickupLocation">{selectedLocation.name}</span>
+                  <span id="selectedPickupLocation">{displayLocation.name}</span>
             </h6>
-            {selectedLocation.details && <span>{selectedLocation.details}</span>}
-            {selectedLocation.hours && (
+                {displayLocation.details && <span>{displayLocation.details}</span>}
+                {displayLocation.hours && (
               <span>
-                <span className="timeMapping">{selectedLocation.hours}</span>
+                    <span className="timeMapping">{displayLocation.hours}</span>
               </span>
             )}
-            {selectedLocation.message && (
+                {displayLocation.message && (
               <div className="messageArea">
                 <p className="messageText">
-                  {showMoreMessage ? selectedLocation.message : selectedLocation.message.substring(0, 70) + '...'}
+                      {showMoreMessage ? displayLocation.message : displayLocation.message.substring(0, 70) + '...'}
                   <span className="showMoreMessage" onClick={() => setShowMoreMessage(!showMoreMessage)}>
                     {showMoreMessage ? ' Show less' : ' Show more'}
                   </span>
@@ -433,7 +492,7 @@ export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation,
           <div className="iframe-wrapper">
             <iframe
               title="map"
-              src={selectedLocation.mapUrl || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.635369064972!2d55.34954871125346!3d25.249203477584405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5d0601c62bdd%3A0x21cb595384b197f5!2sDollar%20Car%20Rental!5e0!3m2!1sen!2sae!4v1689856281638!5m2!1sen!2sae'}
+                  src={displayLocation.mapUrl}
               width="100%"
               height="600"
               loading="lazy"
@@ -441,9 +500,10 @@ export default function LocationPickerPopup({ isOpen, onClose, onSelectLocation,
               style={{ border: 0 }}
             />
           </div>
+            </>
+          ) : null}
         </div>
       </div>
     </div>
   );
 }
-

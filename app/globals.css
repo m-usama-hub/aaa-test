@@ -241,19 +241,32 @@ input[type="checkbox"] {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .pickupReturnLocationPopup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin-top: 0;
-    border-radius: 0;
-    max-height: 100vh;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* Dynamic viewport height for mobile browsers */
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    width: 100vw !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    overflow: hidden !important;
   }
 
   .pickupReturnLocationPopup .inner-wrapper {
     flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
     max-height: 100vh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
   }
 
   .pickupReturnLocationPopup .left-section,
@@ -264,12 +277,186 @@ input[type="checkbox"] {
   .pickupReturnLocationPopup .left-section {
     border-right: none;
     border-bottom: 1px solid #e5e5e5;
-    max-height: 40vh;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pickupReturnLocationPopup .right-section-c {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+    padding: 16px;
+  }
+
+  /* Location popup mobile font sizes - matching datetime popup */
+  .pickupReturnLocationPopup .left-section {
+    padding: 16px;
+  }
+
+  .pickupReturnLocationPopup .branchTypeOuterWrapper {
+    padding: 12px 8px;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .pickupReturnLocationPopup .branchTypeOuterWrapper svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .pickupReturnLocationPopup .branchTypeOuterWrapper p {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .pickupReturnLocationPopup .selectedLocations li {
+    padding: 12px 16px;
+  }
+
+  .pickupReturnLocationPopup .selectedLocations li h6 {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .pickupReturnLocationPopup .location-address {
+    padding: 16px;
+  }
+
+  .pickupReturnLocationPopup .location-address .icon {
+    margin-bottom: 12px;
+  }
+
+  .pickupReturnLocationPopup .location-address .icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pickupReturnLocationPopup .location-address h6 {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 8px;
+  }
+
+  .pickupReturnLocationPopup .location-address span {
+    font-size: 12px;
+    line-height: 16px;
+    margin-bottom: 6px;
+  }
+
+  .pickupReturnLocationPopup .messageArea {
+    margin-top: 12px;
+    padding: 12px;
+  }
+
+  .pickupReturnLocationPopup .messageText {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .pickupReturnLocationPopup .no-results {
+    padding: 16px;
   }
 
   .pickupReturnLocationPopup .no-results p {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  /* Mobile Search Container */
+  .mobile-search-container {
+    padding: 16px;
+    padding-top: 60px; /* Space for close button */
+    border-bottom: 1px solid #e5e5e5;
+    background: white;
+    flex-shrink: 0;
+  }
+
+  .mobile-search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f5f5f5;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 12px 16px;
+    position: relative;
+  }
+
+  .mobile-search-icon {
+    color: #666;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobile-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
     font-size: 16px;
     line-height: 20px;
+    color: #231f20;
+    font-family: 'ProductSansRegular', Arial, Helvetica, sans-serif;
+  }
+
+  .mobile-search-input::placeholder {
+    color: #999;
+  }
+
+  .mobile-search-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+
+  .mobile-search-clear:hover {
+    color: #e31a37;
+  }
+
+  .mobile-search-clear svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Mobile Close Button */
+  .popup-close-btn {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    z-index: 10000 !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    margin: 0 !important;
+  }
+
+  .popup-close-btn:hover {
+    background: white !important;
+    border-color: #e31a37 !important;
+  }
+
+  .popup-close-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    color: #231f20 !important;
   }
 }
 
@@ -602,8 +789,8 @@ input[type="checkbox"] {
   font-weight: normal;
 }
 
-/* Responsive for smaller screens (less than 1920px width or 600px height) */
-@media (max-width: 1920px), (max-height: 600px) {
+/* Responsive for smaller screens (less than 1920px width or 600px height) - but not mobile */
+@media (min-width: 769px) and (max-width: 1920px), (min-width: 769px) and (max-height: 600px) {
   .dateTimePickerPopup {
     position: absolute;
     min-height: 300px;
@@ -624,19 +811,32 @@ input[type="checkbox"] {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .dateTimePickerPopup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin-top: 0;
-    border-radius: 0;
-    max-height: 100vh;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* Dynamic viewport height for mobile browsers */
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    width: 100vw !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    overflow: hidden !important;
   }
 
   .dateTimePickerPopup .inner-wrapper {
     flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
     max-height: 100vh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
   }
 
   .dateTimePickerPopup .left-section-datetime,
@@ -647,61 +847,334 @@ input[type="checkbox"] {
   .dateTimePickerPopup .left-section-datetime {
     border-right: none;
     border-bottom: 1px solid #e5e5e5;
+    padding: 16px;
+    flex-shrink: 0;
+  }
+
+  .dateTimePickerPopup .right-section-datetime {
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* Location details mobile styling */
+  .dateTimePickerPopup .location-details {
+    gap: 12px;
+  }
+
+  .dateTimePickerPopup .location-item {
+    gap: 12px;
+  }
+
+  .dateTimePickerPopup .location-icon {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+  }
+
+  .dateTimePickerPopup .location-name {
+    font-size: 14px;
+    line-height: 18px;
+    margin-bottom: 4px;
+  }
+
+  .dateTimePickerPopup .location-datetime {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .dateTimePickerPopup .location-connector {
+    height: 12px;
+    margin-left: 10px;
+  }
+
+  /* Calendar mobile styling */
+  .dateTimePickerPopup .calendar-section {
+    margin-bottom: 16px;
+  }
+
+  .dateTimePickerPopup .calendar-navigation {
+    gap: 8px;
+    align-items: center;
+  }
+
+  .dateTimePickerPopup .calendar-nav-btn {
+    padding: 8px;
+    flex-shrink: 0;
+  }
+
+  .dateTimePickerPopup .calendar-nav-left {
+    margin-right: 8px;
+  }
+
+  .dateTimePickerPopup .calendar-nav-right {
+    margin-left: 8px;
   }
 
   .dateTimePickerPopup .calendar-months {
     flex-direction: column;
+    gap: 16px;
+  }
+
+  .dateTimePickerPopup .calendar-month-header {
+    font-size: 14px;
+    line-height: 18px;
+    margin-bottom: 12px;
+  }
+
+  .dateTimePickerPopup .calendar-weekdays {
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .dateTimePickerPopup .calendar-weekday {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .dateTimePickerPopup .calendar-grid {
+    gap: 4px;
+  }
+
+  .dateTimePickerPopup .calendar-day {
+    font-size: 14px;
+    line-height: 18px;
+    min-height: 36px;
+  }
+
+  /* Days difference mobile styling */
+  .dateTimePickerPopup .days-difference {
+    padding: 8px 16px;
+    font-size: 12px;
+    line-height: 16px;
+    margin: 12px 0;
+  }
+
+  /* Time selectors mobile styling */
+  .dateTimePickerPopup .time-selectors-section {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .dateTimePickerPopup .time-selector-group {
+    gap: 8px;
+  }
+
+  .dateTimePickerPopup .time-selector-label {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .dateTimePickerPopup .time-selector-display {
+    font-size: 12px;
+    line-height: 16px;
+    margin-bottom: 8px;
+  }
+
+  .dateTimePickerPopup .time-controls {
+    gap: 12px;
+    align-items: center;
+  }
+
+  .dateTimePickerPopup .time-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    line-height: 24px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .dateTimePickerPopup .time-number {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .dateTimePickerPopup .time-period {
+    gap: 8px;
+  }
+
+  .dateTimePickerPopup .period-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    line-height: 16px;
+    min-height: 36px;
+  }
+
+  /* Mobile Close Button for DateTimePicker */
+  .dateTimePickerPopup .popup-close-btn {
+    position: fixed !important;
+    top: 16px !important;
+    right: 16px !important;
+    z-index: 10000 !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    margin: 0 !important;
+  }
+
+  .dateTimePickerPopup .popup-close-btn:hover {
+    background: white !important;
+    border-color: #e31a37 !important;
+  }
+
+  .dateTimePickerPopup .popup-close-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    color: #231f20 !important;
   }
 }
 
 /* Mobile layout tweaks for form and tabs */
 @media (max-width: 768px) {
+  /* Prevent horizontal scrolling */
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
   .container {
     padding-left: 16px;
     padding-right: 16px;
+    max-width: 100%;
+  }
+
+  /* Header adjustments */
+  .header-nav {
+    padding: 12px 0 !important;
+  }
+
+  .header-nav .navbar {
+    padding: 0 !important;
+  }
+
+  /* Booking form layout */
+  .booking-form {
+    width: 100%;
+    max-width: 100%;
   }
 
   .booking-form .booking-row {
     flex-direction: column !important;
+    gap: 16px !important;
+    width: 100%;
+  }
+
+  .booking-form label {
+    margin-bottom: 8px !important;
+    align-items: flex-start !important;
     gap: 12px !important;
   }
+
 
   .booking-form label span {
     font-size: 14px !important;
     line-height: 18px !important;
   }
 
+  /* Location fields container - stack vertically on mobile */
+  /* Target the div that contains both pickup and return location fields */
+  .booking-form .flex.flex-col > div {
+    width: 100% !important;
+  }
+
+  /* Force flex-direction column for location fields container when it has display:flex */
+  .booking-form .flex.flex-col > div[style*="flex"] {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* Ensure all location input wrappers are full width on mobile */
+  .booking-form .flex-col.items-start[style*="width"] {
+    width: 100% !important;
+  }
+
+  /* Input fields - ensure proper sizing for mobile */
   .booking-form input[type="text"] {
     font-size: 16px !important; /* avoid iOS zoom */
     line-height: 22px !important;
     height: 44px !important;
+    min-height: 44px !important; /* Touch target size */
+    padding: 0 12px !important;
   }
 
+  /* Input containers */
+  .booking-form .flex.items-center.border {
+    border-radius: 8px !important;
+    min-height: 44px !important;
+  }
+
+  /* Icons in inputs */
+  .booking-form .flex.items-center.justify-center.text-gray-500 {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 12px !important;
+    margin-left: 12px !important;
+  }
+
+  /* Same return location checkbox */
   .booking-form .same-return-location label {
     font-size: 14px !important;
     line-height: 18px !important;
     padding-left: 28px !important;
   }
 
-  .booking-form .showCarBtn {
-    font-size: 16px !important;
-    line-height: 20px !important;
-    padding: 12px 16px !important;
+  .booking-form .same-return-location label span {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* Deliver to me / Collect from me links */
+  .booking-form #delivery-to-me,
+  .booking-form #promo-code-btn {
+    height: auto !important;
+    min-height: 44px !important;
+    padding: 12px !important;
+    font-size: 14px !important;
+    line-height: 18px !important;
     border-radius: 8px !important;
   }
 
-  .booking-form #promo-code-btn,
-  .booking-form #delivery-to-me {
-    height: auto !important;
-    padding: 10px 12px !important;
-    font-size: 14px !important;
-    line-height: 18px !important;
+  .booking-form #delivery-to-me > div,
+  .booking-form #promo-code-btn > div {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Show Cars button */
+  .booking-form .showCarBtn {
+    font-size: 16px !important;
+    line-height: 20px !important;
+    padding: 14px 24px !important;
+    border-radius: 8px !important;
+    min-height: 44px !important;
+    width: 100% !important;
+  }
+
+  /* Date/Time input fields */
+  .booking-form #pickup,
+  .booking-form #return {
+    font-size: 16px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+
+  /* Tabs styling */
+  .booking-tabs {
+    border-radius: 0 !important;
   }
 
   .booking-tabs nav .flex {
-    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     gap: 16px;
+    padding: 0 16px;
   }
 
   .booking-tabs nav button {
@@ -709,5 +1182,30 @@ input[type="checkbox"] {
     line-height: 20px !important;
     padding: 12px 0 8px 0 !important;
     white-space: nowrap;
+    min-height: 44px !important;
   }
+
+  /* Tab content spacing */
+  .booking-tabs > div:last-child {
+    margin-top: 16px !important;
+    padding: 0 16px 16px 16px;
+  }
+
+  /* Form section spacing */
+  .booking-form > div > div {
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Promo code positioning */
+  .booking-form #promo-code-btn {
+    margin-top: 12px !important;
+  }
+
+  /* Ensure no overflow */
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Location picker popup adjustments already handled above */
 }

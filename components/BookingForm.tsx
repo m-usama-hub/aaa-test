@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MapPinIcon, CalendarIcon, CarIcon, ChevronRightIcon, ClockIcon } from './Icons';
+import { MapPinIcon, CalendarIcon, CarIcon, ChevronRightIcon, ClockIcon, CloseIcon } from './Icons';
 import LocationPickerPopup from './LocationPickerPopup';
 import DateTimePickerPopup from './DateTimePickerPopup';
 
@@ -99,7 +99,7 @@ export default function BookingForm({ type }: BookingFormProps) {
                             {isStartBooking ? 'Pickup & Return Location' : 'Pickup Location'}
                         </span>
                         {isStartBooking && (
-                            <span className="hidden lg:flex items-center same-return-location">
+                            <span className="flex items-center same-return-location">
                                 <input
                                     type="checkbox"
                                     id="sameReturnLocation"
@@ -184,6 +184,27 @@ export default function BookingForm({ type }: BookingFormProps) {
                                             height: '3.05vw',
                                         }}
                                     />
+                                    {pickupLocation && (
+                                        <div
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setPickupLocation('');
+                                                if (sameReturnLocation) {
+                                                    setReturnLocation('');
+                                                }
+                                            }}
+                                            className="flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+                                            style={{
+                                                width: '1.38vw',
+                                                height: '1.66vw',
+                                                margin: '0.69vw',
+                                                marginRight: '0.83vw',
+                                                color: '#666',
+                                            }}
+                                        >
+                                            <CloseIcon />
+                                        </div>
+                                    )}
                                 </div>
                                 
                                 {/* Location Picker Dropdown */}
@@ -200,6 +221,7 @@ export default function BookingForm({ type }: BookingFormProps) {
                                         title="Select Pickup Location"
                                         containerRef={formRef}
                                         searchQuery={pickupLocation}
+                                        selectedLocationName={pickupLocation}
                                     />
                                 )}
                                 
@@ -275,6 +297,24 @@ export default function BookingForm({ type }: BookingFormProps) {
                                                 height: '3.05vw',
                                             }}
                                         />
+                                        {returnLocation && (
+                                            <div
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setReturnLocation('');
+                                                }}
+                                                className="flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity"
+                                                style={{
+                                                    width: '1.38vw',
+                                                    height: '1.66vw',
+                                                    margin: '0.69vw',
+                                                    marginRight: '0.83vw',
+                                                    color: '#666',
+                                                }}
+                                            >
+                                                <CloseIcon />
+                                            </div>
+                                        )}
                                     </div>
                                     
                                     {/* Location Picker Dropdown */}
@@ -286,6 +326,7 @@ export default function BookingForm({ type }: BookingFormProps) {
                                             title="Select Return Location"
                                             containerRef={formRef}
                                             searchQuery={returnLocation}
+                                            selectedLocationName={returnLocation}
                                         />
                                     )}
                                     

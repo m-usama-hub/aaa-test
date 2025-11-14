@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { CloseIcon } from './Icons';
 
 type DateTimePickerPopupProps = {
   isOpen: boolean;
@@ -136,14 +137,19 @@ export default function DateTimePickerPopup({
       if (!isOpen) return;
       const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
       if (popupRef.current && isMobile) {
-        // Clear inline positioning to allow CSS to make it full-screen on mobile
+        // Clear all inline positioning styles to allow CSS to make it full-screen on mobile
         const popup = popupRef.current;
         popup.style.width = '';
         popup.style.left = '';
         popup.style.top = '';
         popup.style.bottom = '';
+        popup.style.right = '';
         popup.style.height = '';
         popup.style.maxHeight = '';
+        popup.style.marginTop = '';
+        popup.style.marginBottom = '';
+        // Ensure full screen on mobile
+        popup.style.position = '';
         return;
       }
 
@@ -395,6 +401,14 @@ export default function DateTimePickerPopup({
 
   return (
     <div ref={popupRef} className="dateTimePickerPopup">
+      {/* Mobile Close Button */}
+      <button
+        onClick={onClose}
+        className="popup-close-btn md:hidden"
+        aria-label="Close popup"
+      >
+        <CloseIcon />
+      </button>
       <div className="inner-wrapper">
         {/* Left Section - Location Details */}
         <div className="left-section-datetime">

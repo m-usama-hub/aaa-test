@@ -6,8 +6,8 @@ import Image from 'next/image';
 export default function Header() {
   return (
     <header className="header-nav bg-white" style={{ boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.2)' }}>
-      <div className="container mx-auto">
-        <div className="navbar flex items-center justify-between py-0">
+      <div className="container mx-auto px-4 md:px-0">
+        <div className="navbar flex items-center justify-between py-3 md:py-5">
           {/* Mobile Menu Toggle */}
           <button className="toggle-icon left-wrap-menu lg:hidden mr-8">
             <span className="one block w-[27px] h-[3px] bg-[#d9d9d9] my-[5px] mx-auto rounded-[5px]"></span>
@@ -15,16 +15,31 @@ export default function Header() {
             <span className="three block w-[27px] h-[3px] bg-[#d9d9d9] my-[5px] mx-auto rounded-[5px]"></span>
           </button>
 
-          {/* Logo */}
-          <Link href="/" className="logo">
-            <Image 
-              src="/dollar.7a3cc7e0.svg" 
-              width={117} 
-              height={39.95} 
-              alt="Dollar Car Rental UAE"
-              priority
-            />
-          </Link>
+          {/* Logo - Centered on mobile */}
+          <div className="flex-1 flex flex-col items-center lg:items-start lg:flex-initial">
+            <Link href="/" className="logo flex flex-col items-center">
+              <Image 
+                src="/dollar.7a3cc7e0.svg" 
+                width={117} 
+                height={39.95} 
+                alt="Dollar Car Rental UAE"
+                priority
+                className="w-auto h-auto"
+                style={{ maxWidth: '117px', height: 'auto' }}
+              />
+            </Link>
+          </div>
+
+          {/* Mobile Login/Register */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#231f20' }}>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <Link href="/" className="text-sm font-bold" style={{ color: '#e21936', fontSize: '14px', lineHeight: '18px' }}>
+              Login | Register
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="navigation-wrap hidden lg:block">

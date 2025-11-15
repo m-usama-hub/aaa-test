@@ -32,7 +32,7 @@ export default function BookingForm({ type }: BookingFormProps) {
 
     // Close dropdown when clicking outside
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
+        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
             const target = event.target as Node;
             
             // Don't close if clicking inside the pickup container (including popup)
@@ -54,6 +54,14 @@ export default function BookingForm({ type }: BookingFormProps) {
                 return;
             }
             
+            // Check if click is inside any popup element (for mobile full-screen popups)
+            const popupElements = document.querySelectorAll('.dateTimePickerPopup, .pickupReturnLocationPopup');
+            for (let i = 0; i < popupElements.length; i++) {
+                if (popupElements[i].contains(target)) {
+                    return;
+                }
+            }
+            
             // Close all popups if clicking outside
             setIsPickupPopupOpen(false);
             setIsReturnPopupOpen(false);
@@ -61,8 +69,10 @@ export default function BookingForm({ type }: BookingFormProps) {
         };
 
         document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
         };
     }, []);
 

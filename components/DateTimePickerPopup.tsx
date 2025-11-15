@@ -266,7 +266,9 @@ export default function DateTimePickerPopup({
     return date < today;
   };
 
-  const handleDateClick = (day: number, month: Date) => {
+  const handleDateClick = (day: number, month: Date, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     const selectedDate = new Date(month.getFullYear(), month.getMonth(), day);
     if (isPastDate(selectedDate)) return;
 
@@ -279,7 +281,9 @@ export default function DateTimePickerPopup({
     }
   };
 
-  const handleTimeChange = (type: 'pickup' | 'return', delta: number) => {
+  const handleTimeChange = (type: 'pickup' | 'return', delta: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     // Increment/decrement by 30 minutes
     const minutesDelta = delta * 30;
     
@@ -306,7 +310,9 @@ export default function DateTimePickerPopup({
     }
   };
 
-  const handlePeriodToggle = (type: 'pickup' | 'return', period: string) => {
+  const handlePeriodToggle = (type: 'pickup' | 'return', period: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (type === 'pickup') {
       let hour = pickupHour.hour;
       // Convert hour based on period change
@@ -332,7 +338,9 @@ export default function DateTimePickerPopup({
     }
   };
 
-  const navigateMonth = (delta: number) => {
+  const navigateMonth = (delta: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1));
   };
 
@@ -360,7 +368,9 @@ export default function DateTimePickerPopup({
         <div
           key={day}
           className={`calendar-day ${isPast ? 'past' : ''} ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''}`}
-          onClick={() => !isPast && handleDateClick(day, month)}
+          onClick={(e) => !isPast && handleDateClick(day, month, e)}
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
         >
           {day}
         </div>
@@ -400,7 +410,12 @@ export default function DateTimePickerPopup({
   const displayReturnHour = getDisplayHour(returnHour.hour);
 
   return (
-    <div ref={popupRef} className="dateTimePickerPopup">
+    <div 
+      ref={popupRef} 
+      className="dateTimePickerPopup"
+      onMouseDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+    >
       {/* Mobile Close Button */}
       <button
         onClick={onClose}
@@ -409,7 +424,11 @@ export default function DateTimePickerPopup({
       >
         <CloseIcon />
       </button>
-      <div className="inner-wrapper">
+      <div 
+        className="inner-wrapper"
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+      >
         {/* Left Section - Location Details */}
         <div className="left-section-datetime">
           <div className="location-details">
@@ -448,7 +467,12 @@ export default function DateTimePickerPopup({
           {/* Calendar Section */}
           <div className="calendar-section">
             <div className="calendar-navigation">
-              <button onClick={() => navigateMonth(-1)} className="calendar-nav-btn calendar-nav-left">
+              <button 
+                onClick={(e) => navigateMonth(-1, e)} 
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                className="calendar-nav-btn calendar-nav-left"
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
@@ -457,7 +481,12 @@ export default function DateTimePickerPopup({
                 {renderCalendar(currentMonth)}
                 {renderCalendar(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
               </div>
-              <button onClick={() => navigateMonth(1)} className="calendar-nav-btn calendar-nav-right">
+              <button 
+                onClick={(e) => navigateMonth(1, e)} 
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                className="calendar-nav-btn calendar-nav-right"
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
@@ -477,20 +506,38 @@ export default function DateTimePickerPopup({
               <label className="time-selector-label">Pickup Date & Time</label>
               <div className="time-selector-display">{formatDateShort(selectedPickupDate)} | {pickupTime}</div>
               <div className="time-controls">
-                <button onClick={() => handleTimeChange('pickup', -1)} className="time-btn">−</button>
+                <button 
+                  onClick={(e) => handleTimeChange('pickup', -1, e)} 
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className="time-btn"
+                >
+                  −
+                </button>
                 <div className="time-value">
                   <span className="time-number">{displayPickupHour.toString().padStart(2, '0')}:{pickupHour.minute.toString().padStart(2, '0')}</span>
                 </div>
-                <button onClick={() => handleTimeChange('pickup', 1)} className="time-btn">+</button>
+                <button 
+                  onClick={(e) => handleTimeChange('pickup', 1, e)} 
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className="time-btn"
+                >
+                  +
+                </button>
                 <div className="time-period">
                   <button 
-                    onClick={() => handlePeriodToggle('pickup', 'AM')} 
+                    onClick={(e) => handlePeriodToggle('pickup', 'AM', e)} 
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
                     className={`period-btn ${pickupPeriod === 'AM' ? 'active' : ''}`}
                   >
                     AM
                   </button>
                   <button 
-                    onClick={() => handlePeriodToggle('pickup', 'PM')} 
+                    onClick={(e) => handlePeriodToggle('pickup', 'PM', e)} 
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
                     className={`period-btn ${pickupPeriod === 'PM' ? 'active' : ''}`}
                   >
                     PM
@@ -504,20 +551,38 @@ export default function DateTimePickerPopup({
               <label className="time-selector-label">Return Date & Time</label>
               <div className="time-selector-display">{formatDateShort(selectedReturnDate)} | {returnTime}</div>
               <div className="time-controls">
-                <button onClick={() => handleTimeChange('return', -1)} className="time-btn">−</button>
+                <button 
+                  onClick={(e) => handleTimeChange('return', -1, e)} 
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className="time-btn"
+                >
+                  −
+                </button>
                 <div className="time-value">
                   <span className="time-number">{displayReturnHour.toString().padStart(2, '0')}:{returnHour.minute.toString().padStart(2, '0')}</span>
                 </div>
-                <button onClick={() => handleTimeChange('return', 1)} className="time-btn">+</button>
+                <button 
+                  onClick={(e) => handleTimeChange('return', 1, e)} 
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  className="time-btn"
+                >
+                  +
+                </button>
                 <div className="time-period">
                   <button 
-                    onClick={() => handlePeriodToggle('return', 'AM')} 
+                    onClick={(e) => handlePeriodToggle('return', 'AM', e)} 
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
                     className={`period-btn ${returnPeriod === 'AM' ? 'active' : ''}`}
                   >
                     AM
                   </button>
                   <button 
-                    onClick={() => handlePeriodToggle('return', 'PM')} 
+                    onClick={(e) => handlePeriodToggle('return', 'PM', e)} 
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
                     className={`period-btn ${returnPeriod === 'PM' ? 'active' : ''}`}
                   >
                     PM

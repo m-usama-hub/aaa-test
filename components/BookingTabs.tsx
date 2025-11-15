@@ -45,7 +45,7 @@ export default function BookingTabs() {
               padding: '1.73vw 0 1.11vw 0',
             }}
           >
-            Monthly Subscription
+            Monthly <br className="md:hidden" />Subscription
             {activeTab === 'monthlySubscription' && (
               <span className="absolute left-0 bottom-[-1.5px] w-full h-[2px] bg-[#e31a37] rounded-[10px]" />
             )}
